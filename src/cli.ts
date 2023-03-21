@@ -22,8 +22,11 @@ if(!binPath) {
 	exit({message: "No binary found."});
 }
 
+// First two arguments are Node binary and this binary
+const args = process.argv.slice(2);
+
 try {
-	await execa(binPath!, process.argv.slice(2), {stdio: "inherit"});
+	await execa(binPath!, args, {stdio: "inherit"});
 } catch(error: unknown) {
 	const potentialError = error as ExecaError | undefined;
 	exit({exitCode: potentialError?.exitCode});
