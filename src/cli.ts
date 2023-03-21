@@ -1,24 +1,30 @@
 #!/usr/bin/env node
 import process from "node:process";
 import {getBinPath} from "get-bin-path";
-import {execa} from "execa";
+import {execa, type ExecaError} from "execa";
 
-const exit = (message?: string) => {
+type ExitOptions = {
+	message?: string;
+	exitCode?: number;
+};
+
+const exit = ({message, exitCode = 1}: ExitOptions = {}) => {
 	if(message) {
 		console.error(message);
 	}
 
-	process.exit(1);
+	process.exit(exitCode);
 };
 
 const binPath = await getBinPath();
 
 if(!binPath) {
-	exit("No binary found.");
+	exit({message: "No binary found."});
 }
 
 try {
 	await execa(binPath!, process.argv.slice(2), {stdio: "inherit"});
-} catch {
-	exit();
+} catch(error: unknown) {
+	const potentialError = error as ExecaError | undefined;
+	exit({exitCode: potentialError?.exitCode});
 }
