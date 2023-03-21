@@ -2,7 +2,11 @@
 
 Execute the current package's binary.
 
+<p align="center"><img src="media/demo.gif"></p>
+
 Like using `npm link`, but doesn't add your binary to the global path.
+
+*Demo with [`listr-cli`](https://github.com/tommy-mitchell/listr-cli).*
 
 ## Install
 
