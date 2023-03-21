@@ -1,7 +1,7 @@
 import {fileURLToPath} from "node:url";
 import path from "node:path";
 import anyTest, {type TestFn} from "ava";
-import {execa, type Options} from "execa";
+import {execa, type Options, type ExecaError} from "execa";
 import {getBinPath} from "get-bin-path";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -9,11 +9,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const test = anyTest as TestFn<{
 	binPath: string;
 }>;
-
-type ExecaError = {
-	readonly exitCode: number;
-	readonly stderr: any;
-} & Error;
 
 test.before("get bin path", async t => {
 	const binPath = await getBinPath();
@@ -37,7 +32,7 @@ test("fail", async t => {
 		execa(t.context.binPath, [], atFixture("failure")),
 	);
 
-	t.is(error?.exitCode, 1);
+	t.is(error?.exitCode, 2);
 	t.is(error?.stderr, "Missing required flag\n\t--foo");
 });
 
@@ -58,6 +53,6 @@ test("accepts arguments", async t => {
 		t.is(stdout.trim(), expected);
 	};
 
-	await run([], "$ arguments [...]");
+	await run([], "Arguments: []");
 	await run(["1", "2", "3"], "Arguments: [1, 2, 3]");
 });
