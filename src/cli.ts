@@ -18,7 +18,7 @@ if(!binPath) {
 }
 
 try {
-	await execa(binPath!, process.argv, {stdio: "inherit"});
+	await execa(binPath!, process.argv.slice(2), {stdio: "inherit"});
 } catch {
 	exit();
 }

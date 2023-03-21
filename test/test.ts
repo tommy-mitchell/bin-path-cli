@@ -49,3 +49,15 @@ test("no bin", async t => {
 	t.is(error?.exitCode, 1);
 	t.is(error?.stderr, "No binary found.");
 });
+
+test("accepts arguments", async t => {
+	const run = async (args: string[], expected: string) => {
+		const {exitCode, stdout} = await execa(t.context.binPath, args, atFixture("arguments"));
+
+		t.is(exitCode, 0);
+		t.is(stdout.trim(), expected);
+	};
+
+	await run([], "$ arguments [...]");
+	await run(["1", "2", "3"], "Arguments: [1, 2, 3]");
+});
