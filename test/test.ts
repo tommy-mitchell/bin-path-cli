@@ -8,6 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const test = anyTest as TestFn<{
 	binPath: string;
+	helpText: string;
 }>;
 
 test.before("get bin path", async t => {
@@ -16,6 +17,10 @@ test.before("get bin path", async t => {
 	t.truthy(binPath, "No bin path found!");
 
 	t.context.binPath = binPath!;
+});
+
+test.before("setup context", t => {
+	t.context.helpText = "No binary found. Usage: `$ npx bin-path [binary-name] [arguments or flags…]`";
 });
 
 const atFixture = (name: string): Options => ({cwd: `${__dirname}/fixtures/${name}`});
@@ -42,7 +47,7 @@ test("no bin", async t => {
 	);
 
 	t.is(error?.exitCode, 1);
-	t.is(error?.stderr, "No binary found.");
+	t.is(error?.stderr, t.context.helpText);
 });
 
 test("accepts arguments", async t => {
@@ -84,5 +89,5 @@ test("named binary - no default", async t => {
 	const error = await t.throwsAsync<ExecaError>(execa(t.context.binPath, [], atFixture("named-binaries/no-default")));
 
 	t.is(error?.exitCode, 1);
-	t.is(error?.stderr, "No binary found.");
+	t.is(error?.stderr, t.context.helpText);
 });

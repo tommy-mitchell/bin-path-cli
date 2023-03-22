@@ -41,7 +41,7 @@ const maybeBinaryName = args.at(0);
 const binPath = await tryGetBinPath(maybeBinaryName);
 
 if(!binPath) {
-	exit({message: "No binary found."});
+	exit({message: "No binary found. Usage: `$ npx bin-path [binary-name] [arguments or flags…]`"});
 }
 
 try {
