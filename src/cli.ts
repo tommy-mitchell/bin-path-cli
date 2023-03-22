@@ -37,7 +37,7 @@ const tryGetBinPath = async (binaryName?: string): ReturnType<typeof getBinPath>
 };
 
 // First argument could be a named binary to use
-const maybeBinaryName = args.at(0);
+const maybeBinaryName = args[0] ?? undefined;
 const binPath = await tryGetBinPath(maybeBinaryName);
 
 if(!binPath) {
