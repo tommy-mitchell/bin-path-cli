@@ -32,7 +32,8 @@
 	"scripts": {
 		"prepublishOnly": "npm run build",
 		"build": "tsc && chmod +x dist/cli.js",
-		"test": "listr xo 'c8 ava'"
+		"test": "listr xo 'c8 ava'",
+		"ci": "npm run build && xo && ava"
 	},
 	"dependencies": {
 		"execa": "^7.1.1",
