@@ -96,4 +96,4 @@ $ npx bin-path bar --bar-flag
 
 ## Related
 
-- [get-bin-path](https://github.com/ehmicky/get-bin-path) - The library used to build this.
+- [get-bin-path](https://github.com/ehmicky/get-bin-path) - Get the current package's binary path.
