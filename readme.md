@@ -30,7 +30,7 @@ yarn add --dev bin-path-cli
 npx bin-path [binary-name] [arguments or flags…]
 ```
 
-### Cuurent Working Directory
+### Curent Working Directory
 
 Inside of a directory with a `package.json` that specifies a binary either via `bin` or `directories.bin`, run via:
 
@@ -91,6 +91,26 @@ $ npx bin-path foo --foo-flag
 
 # `bar` binary
 $ npx bin-path bar --bar-flag
+```
+</details>
+
+Omitting a name searches for a binary with the same name as the project (i.e. `name` in `package.json`). This is the "default" binary.
+
+<details>
+<summary>Example</summary>
+
+```jsonc
+// package.json
+"name": "foo",
+"bin": {
+	"foo": "./foo.js",
+	"bar": "./bar.js"
+}
+```
+
+```sh
+# `foo` binary
+$ npx bin-path --foo-flag
 ```
 </details>
 

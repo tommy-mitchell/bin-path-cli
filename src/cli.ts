@@ -20,7 +20,7 @@ const exit = ({message, exitCode = 1}: ExitOptions = {}) => {
 // First two arguments are Node binary and this binary
 const args = process.argv.slice(2);
 
-/** Attempt to get a named binary from the first argument, fallback to default binary. */
+/** Attempt to get a named binary from the first argument, or fallback to default binary. */
 const tryGetBinPath = async (binaryName?: string): ReturnType<typeof getBinPath> => {
 	if(binaryName) {
 		const binPath = await getBinPath({name: binaryName});
