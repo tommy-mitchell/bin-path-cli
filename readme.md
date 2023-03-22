@@ -27,10 +27,93 @@ yarn add --dev bin-path-cli
 ## Usage
 
 ```sh
-# in a directory with your `package.json`
-$ bin-path --some-flag arg1 arg2
+npx bin-path [binary-name] [arguments or flags…]
 ```
+
+### Curent Working Directory
+
+Inside of a directory with a `package.json` that specifies a binary either via `bin` or `directories.bin`, run via:
+
+```sh
+npx bin-path
+```
+
+If no binary is found, the `bin-path` command fails.
+
+### Arguments
+
+Flags and arguments are passed as-is to your binary:
+
+```sh
+$ npx bin-path --some-flag arg1 arg2
+```
+
+<details>
+<summary>Example</summary>
+
+```js
+// cli.js
+#!/usr/bin/env node
+import meow from "meow";
+
+const {input} = meow({importMeta: import.meta});
+console.log(`Arguments: [${input.join(", ")}]`);
+```
+
+```sh
+$ npx bin-path arg1 arg2
+#=> "Arguments: [arg1, arg2]"
+```
+</details>
+
+### Named binaries
+
+If you have multiple exported binaries, they can be accessed by name if passed as the first argument to `bin-path`:
+
+```sh
+$ npx bin-path binary-name
+```
+
+<details>
+<summary>Example</summary>
+
+```jsonc
+// package.json
+"bin": {
+	"foo": "./foo.js",
+	"bar": "./bar.js"
+}
+```
+
+```sh
+# `foo` binary
+$ npx bin-path foo --foo-flag
+
+# `bar` binary
+$ npx bin-path bar --bar-flag
+```
+</details>
+
+Omitting a name searches for a binary with the same name as the project (i.e. `name` in `package.json`). This is the "default" binary.
+
+<details>
+<summary>Example</summary>
+
+```jsonc
+// package.json
+"name": "foo",
+"bin": {
+	"foo": "./foo.js",
+	"bar": "./bar.js"
+}
+```
+
+```sh
+# `foo` binary
+$ npx bin-path --foo-flag
+```
+</details>
 
 ## Related
 
-- [get-bin-path](https://github.com/ehmicky/get-bin-path) - The library used to build this.
+- [get-bin-path](https://github.com/ehmicky/get-bin-path) - Get the current package's binary path.

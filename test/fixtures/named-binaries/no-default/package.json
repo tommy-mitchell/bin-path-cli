@@ -1,0 +1,8 @@
+{
+	"name": "baz",
+	"bin": {
+		"foo": "./foo.js",
+		"bar": "./bar.js"
+	},
+	"type": "module"
+}
