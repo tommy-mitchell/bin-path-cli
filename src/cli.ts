@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env tsx
 import process from "node:process";
 import {getBinPath} from "get-bin-path";
 import {execa, type ExecaError} from "execa";

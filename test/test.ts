@@ -2,7 +2,6 @@ import {fileURLToPath} from "node:url";
 import path from "node:path";
 import anyTest, {type TestFn} from "ava";
 import {execa, type Options, type ExecaError} from "execa";
-import {getBinPath} from "get-bin-path";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -11,15 +10,8 @@ const test = anyTest as TestFn<{
 	helpText: string;
 }>;
 
-test.before("get bin path", async t => {
-	const binPath = await getBinPath();
-
-	t.truthy(binPath, "No bin path found!");
-
-	t.context.binPath = binPath!;
-});
-
 test.before("setup context", t => {
+	t.context.binPath = path.resolve(__dirname, "../src/cli.ts");
 	t.context.helpText = "No binary found. Usage: `$ npx bin-path [binary-name] [arguments or flags…]`";
 });
 
