@@ -11,7 +11,7 @@ Like using `npm link`, but doesn't add your binary to the global path.
 ## Install
 
 ```sh
-node install --global bin-path-cli
+npm install --global bin-path-cli
 ```
 
 <details>
