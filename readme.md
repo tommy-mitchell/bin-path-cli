@@ -11,14 +11,14 @@ Like using `npm link`, but doesn't add your binary to the global path.
 ## Install
 
 ```sh
-node install --save-dev bin-path-cli
+node install --global bin-path-cli
 ```
 
 <details>
 <summary>Other Package Managers</summary>
 
 ```sh
-yarn add --dev bin-path-cli
+yarn global add bin-path-cli
 ```
 </details>
 
