@@ -48,5 +48,14 @@ try {
 	await execa(binPath!, args, {stdio: "inherit"});
 } catch(error: unknown) {
 	const potentialError = error as ExecaError | undefined;
+
+	if(potentialError?.shortMessage.includes("EACCES")) {
+		exit({message: "The binary could not be executed. Does it have the right permissions?"});
+	}
+
+	if(potentialError?.shortMessage.includes("ENOENT")) {
+		exit({message: "The binary does not exist. Does it need to be built?"});
+	}
+
 	exit({exitCode: potentialError?.exitCode});
 }

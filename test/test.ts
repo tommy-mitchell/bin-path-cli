@@ -12,7 +12,7 @@ const test = anyTest as TestFn<{
 
 test.before("setup context", t => {
 	t.context.binPath = path.resolve(__dirname, "../src/cli.ts");
-	t.context.helpText = "No binary found. Usage: `$ npx bin-path [binary-name] [arguments or flags…]`";
+	t.context.helpText = "Usage: `$ npx bin-path [binary-name] [arguments or flags…]`";
 });
 
 const atFixture = (name: string): Options => ({cwd: `${__dirname}/fixtures/${name}`});
@@ -39,7 +39,7 @@ test("no bin", async t => {
 	);
 
 	t.is(error?.exitCode, 1);
-	t.is(error?.stderr, t.context.helpText);
+	t.is(error?.stderr, `No binary found. ${t.context.helpText}`);
 });
 
 test("accepts arguments", async t => {
@@ -81,5 +81,23 @@ test("named binary - no default", async t => {
 	const error = await t.throwsAsync<ExecaError>(execa(t.context.binPath, [], atFixture("named-binaries/no-default")));
 
 	t.is(error?.exitCode, 1);
-	t.is(error?.stderr, t.context.helpText);
+	t.is(error?.stderr, `No binary found. ${t.context.helpText}`);
+});
+
+test("handles incorrect execute permissions", async t => {
+	const error = await t.throwsAsync<ExecaError>(
+		execa(t.context.binPath, [], atFixture("bad-permissions")),
+	);
+
+	t.is(error?.exitCode, 1);
+	t.is(error?.stderr, "The binary could not be executed. Does it have the right permissions?");
+});
+
+test("missing binary", async t => {
+	const error = await t.throwsAsync<ExecaError>(
+		execa(t.context.binPath, [], atFixture("missing-binary")),
+	);
+
+	t.is(error?.exitCode, 1);
+	t.is(error?.stderr, "The binary does not exist. Does it need to be built?");
 });
