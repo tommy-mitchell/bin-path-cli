@@ -31,7 +31,7 @@
 	],
 	"scripts": {
 		"prepublishOnly": "npm run build",
-		"build": "tsc && chmod +x dist/cli.js",
+		"build": "tsc && chmodx --package",
 		"postbuild": "replace-in-files dist/cli.js --string='#!/usr/bin/env tsx' --replacement='#!/usr/bin/env node'",
 		"test": "listr xo 'c8 ava'"
 	},
@@ -44,6 +44,7 @@
 		"@types/node": "^14.8",
 		"ava": "^5.2.0",
 		"c8": "^7.13.0",
+		"chmodx": "^1.0.0",
 		"listr-cli": "^0.3.0",
 		"meow": "^11.0.0",
 		"replace-in-files-cli": "^2.0.0",
