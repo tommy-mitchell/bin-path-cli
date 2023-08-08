@@ -1,7 +1,7 @@
-import {fileURLToPath} from "node:url";
+import { fileURLToPath } from "node:url";
 import path from "node:path";
-import anyTest, {type TestFn} from "ava";
-import {execa, type Options, type ExecaError} from "execa";
+import anyTest, { type TestFn } from "ava";
+import { execa, type Options, type ExecaError } from "execa";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -15,10 +15,10 @@ test.before("setup context", t => {
 	t.context.helpText = "Usage: `$ npx bin-path [binary-name] [arguments or flags…]`";
 });
 
-const atFixture = (name: string): Options => ({cwd: `${__dirname}/fixtures/${name}`});
+const atFixture = (name: string): Options => ({ cwd: `${__dirname}/fixtures/${name}` });
 
 test("main", async t => {
-	const {exitCode, stdout} = await execa(t.context.binPath, ["--foo=bar"], atFixture("success"));
+	const { exitCode, stdout } = await execa(t.context.binPath, ["--foo=bar"], atFixture("success"));
 
 	t.is(exitCode, 0);
 	t.is(stdout, "bar");
@@ -44,7 +44,7 @@ test("no bin", async t => {
 
 test("accepts arguments", async t => {
 	const run = async (args: string[], expected: string) => {
-		const {exitCode, stdout} = await execa(t.context.binPath, args, atFixture("arguments"));
+		const { exitCode, stdout } = await execa(t.context.binPath, args, atFixture("arguments"));
 
 		t.is(exitCode, 0);
 		t.is(stdout.trim(), expected);
@@ -56,7 +56,7 @@ test("accepts arguments", async t => {
 
 test("named binary - with default", async t => {
 	const run = async (args: string[], expected: string) => {
-		const {exitCode, stdout} = await execa(t.context.binPath, args, atFixture("named-binaries/with-default"));
+		const { exitCode, stdout } = await execa(t.context.binPath, args, atFixture("named-binaries/with-default"));
 
 		t.is(exitCode, 0);
 		t.is(stdout, expected);
@@ -69,7 +69,7 @@ test("named binary - with default", async t => {
 
 test("named binary - no default", async t => {
 	const run = async (args: string[], expected: string) => {
-		const {exitCode, stdout} = await execa(t.context.binPath, args, atFixture("named-binaries/no-default"));
+		const { exitCode, stdout } = await execa(t.context.binPath, args, atFixture("named-binaries/no-default"));
 
 		t.is(exitCode, 0);
 		t.is(stdout, expected);
