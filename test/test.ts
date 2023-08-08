@@ -1,103 +1,182 @@
-import { fileURLToPath } from "node:url";
+import process from "node:process";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import anyTest, { type TestFn } from "ava";
-import { execa, type Options, type ExecaError } from "execa";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import { Semaphore, type Permit } from "@shopify/semaphore";
+import { getBinPath } from "get-bin-path";
+import { isExecutable } from "is-executable";
+import { execa, type ExecaError } from "execa";
 
 const test = anyTest as TestFn<{
 	binPath: string;
-	helpText: string;
+	permit: Permit;
 }>;
 
-test.before("setup context", t => {
-	t.context.binPath = path.resolve(__dirname, "../src/cli.ts");
-	t.context.helpText = "Usage: `$ npx bin-path [binary-name] [arguments or flags…]`";
+const helpText = "Usage: `$ npx bin-path [binary-name] [arguments or flags…]`";
+
+test.before("setup context", async t => {
+	const binPath = await getBinPath();
+	t.truthy(binPath, "No bin path found!");
+
+	t.context.binPath = binPath!.replace("dist", "src").replace(".js", ".ts");
+	t.true(await isExecutable(t.context.binPath), "Source binary not executable!");
 });
 
-const atFixture = (name: string): Options => ({ cwd: `${__dirname}/fixtures/${name}` });
+// https://github.com/avajs/ava/discussions/3177
+const semaphore = new Semaphore(Number(process.env["concurrency"]) || 5);
 
-test("main", async t => {
-	const { exitCode, stdout } = await execa(t.context.binPath, ["--foo=bar"], atFixture("success"));
-
-	t.is(exitCode, 0);
-	t.is(stdout, "bar");
+test.beforeEach("setup concurrency", async t => {
+	t.context.permit = await semaphore.acquire();
 });
 
-test("fail", async t => {
-	const error = await t.throwsAsync<ExecaError>(
-		execa(t.context.binPath, [], atFixture("failure")),
+test.afterEach.always(async t => {
+	await t.context.permit.release();
+});
+
+type VerifyCliArgs = {
+	/** Resolved relative to `test/fixtures` */
+	fixture: string;
+	args?: string;
+	expectations: (
+		| { stdout: string }
+		| { stderr: string; exitCode: number }
 	);
+};
 
-	t.is(error?.exitCode, 2);
-	t.is(error?.stderr, "Missing required flag\n\t--foo");
+const cliExpectedToPass = (expectations: VerifyCliArgs["expectations"]): expectations is { stdout: string } => (
+	(expectations as { stdout: string }).stdout !== undefined
+);
+
+const verifyCli = test.macro(async (t, { fixture, args: rawArgs, expectations }: VerifyCliArgs) => {
+	const cwd = path.resolve(fileURLToPath(import.meta.url), "..", "fixtures", ...fixture.split("/"));
+	const args = rawArgs?.split(" ") ?? [];
+
+	const assertions = await t.try(async tt => {
+		if (cliExpectedToPass(expectations)) {
+			tt.log("stdout:", expectations.stdout);
+			const { exitCode, stdout } = await execa(tt.context.binPath, args, { cwd });
+
+			tt.is(exitCode, 0);
+			tt.is(stdout, expectations.stdout);
+		} else {
+			tt.log("stderr:", expectations.stderr);
+			tt.log("exitCode:", expectations.exitCode);
+
+			const error = await tt.throwsAsync<ExecaError>(
+				execa(tt.context.binPath, args, { cwd }),
+			);
+
+			tt.is(error?.exitCode, expectations.exitCode);
+			tt.is(error?.stderr, expectations.stderr);
+		}
+	});
+
+	if (!assertions.passed) {
+		t.log("fixture:", fixture);
+		t.log("args:", args);
+	}
+
+	assertions.commit({ retainLogs: !assertions.passed });
 });
 
-test("no bin", async t => {
-	const error = await t.throwsAsync<ExecaError>(
-		execa(t.context.binPath, [], atFixture("no-bin")),
-	);
-
-	t.is(error?.exitCode, 1);
-	t.is(error?.stderr, `No binary found. ${t.context.helpText}`);
+test("main", verifyCli, {
+	fixture: "success",
+	args: "--foo=bar",
+	expectations: {
+		stdout: "bar",
+	},
 });
 
-test("accepts arguments", async t => {
-	const run = async (args: string[], expected: string) => {
-		const { exitCode, stdout } = await execa(t.context.binPath, args, atFixture("arguments"));
-
-		t.is(exitCode, 0);
-		t.is(stdout.trim(), expected);
-	};
-
-	await run([], "Arguments: []");
-	await run(["1", "2", "3"], "Arguments: [1, 2, 3]");
+test("fail", verifyCli, {
+	fixture: "failure",
+	expectations: {
+		exitCode: 2,
+		stderr: "Missing required flag\n\t--foo",
+	},
 });
 
-test("named binary - with default", async t => {
-	const run = async (args: string[], expected: string) => {
-		const { exitCode, stdout } = await execa(t.context.binPath, args, atFixture("named-binaries/with-default"));
-
-		t.is(exitCode, 0);
-		t.is(stdout, expected);
-	};
-
-	await run(["foo"], "foo");
-	await run(["bar"], "bar");
-	await run([], "foo");
+test("no bin", verifyCli, {
+	fixture: "no-bin",
+	expectations: {
+		exitCode: 1,
+		stderr: `No binary found. ${helpText}`,
+	},
 });
 
-test("named binary - no default", async t => {
-	const run = async (args: string[], expected: string) => {
-		const { exitCode, stdout } = await execa(t.context.binPath, args, atFixture("named-binaries/no-default"));
-
-		t.is(exitCode, 0);
-		t.is(stdout, expected);
-	};
-
-	await run(["foo"], "foo");
-	await run(["bar"], "bar");
-
-	const error = await t.throwsAsync<ExecaError>(execa(t.context.binPath, [], atFixture("named-binaries/no-default")));
-
-	t.is(error?.exitCode, 1);
-	t.is(error?.stderr, `No binary found. ${t.context.helpText}`);
+test("no arguments", verifyCli, {
+	fixture: "arguments",
+	expectations: {
+		stdout: "Arguments: []",
+	},
 });
 
-test("handles incorrect execute permissions", async t => {
-	const error = await t.throwsAsync<ExecaError>(
-		execa(t.context.binPath, [], atFixture("bad-permissions")),
-	);
-
-	t.is(error?.exitCode, 1);
-	t.is(error?.stderr, "The binary could not be executed. Does it have the right permissions?");
+test("accepts arguments", verifyCli, {
+	fixture: "arguments",
+	args: "1 2 3",
+	expectations: {
+		stdout: "Arguments: [1, 2, 3]",
+	},
 });
 
-test("missing binary", async t => {
-	const error = await t.throwsAsync<ExecaError>(
-		execa(t.context.binPath, [], atFixture("missing-binary")),
-	);
+test("named binary - with default - default", verifyCli, {
+	fixture: "named-binaries/with-default",
+	expectations: {
+		stdout: "foo",
+	},
+});
 
-	t.is(error?.exitCode, 1);
-	t.is(error?.stderr, "The binary does not exist. Does it need to be built?");
+test("named binary - with default - named default", verifyCli, {
+	fixture: "named-binaries/with-default",
+	args: "foo",
+	expectations: {
+		stdout: "foo",
+	},
+});
+
+test("named binary - with default - named non-default", verifyCli, {
+	fixture: "named-binaries/with-default",
+	args: "bar",
+	expectations: {
+		stdout: "bar",
+	},
+});
+
+test("named binary - no default - errors", verifyCli, {
+	fixture: "named-binaries/no-default",
+	expectations: {
+		exitCode: 1,
+		stderr: `No binary found. ${helpText}`,
+	},
+});
+
+test("named binary - no default - named one", verifyCli, {
+	fixture: "named-binaries/no-default",
+	args: "foo",
+	expectations: {
+		stdout: "foo",
+	},
+});
+
+test("named binary - no default - named two", verifyCli, {
+	fixture: "named-binaries/no-default",
+	args: "bar",
+	expectations: {
+		stdout: "bar",
+	},
+});
+
+test("handles incorrect execute permissions", verifyCli, {
+	fixture: "bad-permissions",
+	expectations: {
+		exitCode: 1,
+		stderr: "The binary could not be executed. Does it have the right permissions?",
+	},
+});
+
+test("missing binary", verifyCli, {
+	fixture: "missing-binary",
+	expectations: {
+		exitCode: 1,
+		stderr: "The binary does not exist. Does it need to be built?",
+	},
 });

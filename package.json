@@ -46,6 +46,9 @@
 		"extensions": {
 			"ts": "module"
 		},
+		"environmentVariables": {
+			"concurrency": "5"
+		},
 		"nodeArguments": [
 			"--loader=tsx",
 			"--no-warnings=ExperimentalWarning"
@@ -56,12 +59,14 @@
 		"get-bin-path": "^10.0.0"
 	},
 	"devDependencies": {
+		"@shopify/semaphore": "^3.0.2",
 		"@tommy-mitchell/tsconfig": "^1.1.0",
 		"@types/node": "^16.17",
 		"ava": "^5.3.1",
 		"c8": "^8.0.1",
 		"cross-env": "^7.0.3",
 		"execify-cli": "^0.1.0",
+		"is-executable": "^2.0.1",
 		"listr-cli": "^0.3.0",
 		"meow": "^11.0.0",
 		"tsx": "^3.12.7",
