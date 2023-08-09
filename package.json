@@ -36,8 +36,7 @@
 		"prepare": "npm run build",
 		"build": "tsc -p tsconfig.build.json && execify --pkg --fix-shebang",
 		"lint": "xo",
-		"test": "listr 'tsc --noEmit' 'c8 npm run ava'",
-		"ava": "cross-env NODE_OPTIONS='--loader=ts-node/esm --loader=esmock --no-warnings=ExperimentalWarning' ava"
+		"test": "listr 'tsc --noEmit' 'c8 ava'"
 	},
 	"ava": {
 		"files": [

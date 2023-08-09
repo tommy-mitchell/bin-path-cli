@@ -23,6 +23,12 @@ test("maps dist to source", verifyHelper, {
 	expected: "src/foo.ts",
 });
 
+test("works with different map", verifyHelper, {
+	binPath: "build/foo.js",
+	map: "build.js:::source.ts",
+	expected: "source/foo.ts",
+});
+
 test("has no effect if map is invalid", verifyHelper, {
 	binPath: "dist/foo.js",
 	map: "dist:::src",
