@@ -12,7 +12,7 @@ const test = anyTest as TestFn<{
 	permit: Permit;
 }>;
 
-const helpText = "Usage: `$ npx bin-path [binary-name] [arguments or flags…]`";
+const helpText = "Usage: `$ npx bin-path [source-map] [binary-name] [arguments or flags…]`";
 
 test.before("setup context", async t => {
 	const binPath = await getBinPath();
@@ -178,5 +178,13 @@ test("missing binary", verifyCli, {
 	expectations: {
 		exitCode: 1,
 		stderr: "The binary does not exist. Does it need to be built?",
+	},
+});
+
+test("maps dist to src", verifyCli, {
+	fixture: "map",
+	args: "build.js:::source.ts --foo=bar",
+	expectations: {
+		stdout: "bar",
 	},
 });

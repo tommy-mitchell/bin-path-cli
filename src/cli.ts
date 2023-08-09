@@ -1,17 +1,26 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env ts-node-esm
 import process from "node:process";
 import { execa, type ExecaError } from "execa";
-import { tryGetBinPath, exit } from "./helpers.js";
+import { exit, tryGetBinPath, tryMapBinPath } from "./helpers.js";
 
 // First two arguments are Node binary and this binary
 const args = process.argv.slice(2);
 
-// First argument could be a named binary to use
-const maybeBinaryName = args.at(0);
-const binPath = await tryGetBinPath({ args, binaryName: maybeBinaryName });
+const firstArg = args.at(0);
+const shouldMap = firstArg?.includes(":::");
+
+if (shouldMap) {
+	args.shift();
+}
+
+let binPath = await tryGetBinPath({ args });
 
 if (!binPath) {
-	exit({ message: "No binary found. Usage: `$ npx bin-path [binary-name] [arguments or flags…]`" });
+	exit({ message: "No binary found. Usage: `$ npx bin-path [source-map] [binary-name] [arguments or flags…]`" });
+}
+
+if (shouldMap) {
+	binPath = tryMapBinPath({ binPath: binPath!, map: firstArg! });
 }
 
 try {

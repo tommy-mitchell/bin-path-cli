@@ -1,0 +1,4 @@
+{
+	"bin": "./dist/cli.js",
+	"type": "module"
+}
