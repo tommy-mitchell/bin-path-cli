@@ -1,47 +1,26 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env ts-node-esm
 import process from "node:process";
-import { getBinPath } from "get-bin-path";
 import { execa, type ExecaError } from "execa";
-
-type ExitOptions = {
-	message?: string;
-	exitCode?: number;
-};
-
-/** Exit with an optional error message. */
-const exit = ({ message, exitCode = 1 }: ExitOptions = {}) => {
-	if (message) {
-		console.error(message);
-	}
-
-	process.exit(exitCode);
-};
+import { exit, tryGetBinPath, tryMapBinPath } from "./helpers.js";
 
 // First two arguments are Node binary and this binary
 const args = process.argv.slice(2);
 
-/** Attempt to get a named binary from the first argument, or fallback to default binary. */
-const tryGetBinPath = async (binaryName?: string): ReturnType<typeof getBinPath> => {
-	if (binaryName) {
-		const binPath = await getBinPath({ name: binaryName });
+const firstArg = args.at(0);
+const shouldMap = firstArg?.includes(":::");
 
-		if (binPath) {
-			args.shift();
-			return binPath;
-		}
+if (shouldMap) {
+	args.shift();
+}
 
-		return tryGetBinPath();
-	}
-
-	return getBinPath();
-};
-
-// First argument could be a named binary to use
-const maybeBinaryName = args.at(0);
-const binPath = await tryGetBinPath(maybeBinaryName);
+let binPath = await tryGetBinPath({ args });
 
 if (!binPath) {
-	exit({ message: "No binary found. Usage: `$ npx bin-path [binary-name] [arguments or flags…]`" });
+	exit({ message: "No binary found. Usage: `$ npx bin-path [source-map] [binary-name] [arguments or flags…]`" });
+}
+
+if (shouldMap) {
+	binPath = tryMapBinPath({ binPath: binPath!, map: firstArg! });
 }
 
 try {

@@ -22,12 +22,10 @@ yarn global add bin-path-cli
 ```
 </details>
 
-*Uses top-level await. Requires Node 14.8 or higher.*
-
 ## Usage
 
 ```sh
-npx bin-path [binary-name] [arguments or flags…]
+npx bin-path [source-map] [binary-name] [arguments or flags…]
 ```
 
 ### Curent Working Directory
@@ -54,10 +52,10 @@ $ npx bin-path --some-flag arg1 arg2
 ```js
 // cli.js
 #!/usr/bin/env node
-import meow from "meow";
+import process from "node:process";
 
-const {input} = meow({importMeta: import.meta});
-console.log(`Arguments: [${input.join(", ")}]`);
+const args = process.argv.slice(2);
+console.log(`Arguments: [${args.join(", ")}]`);
 ```
 
 ```sh
@@ -113,6 +111,45 @@ Omitting a name searches for a binary with the same name as the project (i.e. `n
 $ npx bin-path --foo-flag
 ```
 </details>
+
+### Source Mapping
+
+If you're writing your binary in a language that compiles to JavaScript (e.g. TypeScript) and would like to test your source binary, you can map the built file to the source file by using the following format as the first argument to `bin-path`:
+
+```sh
+$ npx bin-path dist.js:::src.ts
+```
+
+<details>
+<summary>Example</summary>
+
+```
+\__ dist/
+    \__ cli.js
+\__ src/
+    \__ cli.ts
+\__ package.json
+```
+
+</details>
+
+#### Notice
+
+This is an experimental feature, currently only available under the `beta` dist-tag. To use, install `bin-path-cli` with:
+
+```sh
+npm install --global bin-path-cli@beta
+```
+
+<details>
+<summary>Other Package Managers</summary>
+
+```sh
+yarn global add bin-path-cli@beta
+```
+</details>
+
+The feature is under-tested and the syntax is subject to change. If you have any problems or suggestings, please [file an issue](https://github.com/tommy-mitchell/bin-path-cli/issues/new).
 
 ## Related
 

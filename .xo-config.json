@@ -3,7 +3,8 @@
 		"arrow-parens": "off",
 		"quotes": ["error", "double"],
 		"object-curly-spacing": ["error", "always"],
-		"object-shorthand": ["error", "always", { "avoidExplicitReturnArrows": false }]
+		"object-shorthand": ["error", "always", { "avoidExplicitReturnArrows": false }],
+		"unicorn/no-process-exit": "off"
 	},
 	"overrides": [
 		{
@@ -16,6 +17,12 @@
 				"@typescript-eslint/no-confusing-void-expression": ["error", { "ignoreArrowShorthand": true }],
 				"n/file-extension-in-import": ["error", "always", { ".ts": "always" }],
 				"@typescript-eslint/prefer-regexp-exec": "off"
+			}
+		},
+		{
+			"files": "test/fixtures/**/*.*",
+			"rules": {
+				"import/no-extraneous-dependencies": "off"
 			}
 		}
 	]
