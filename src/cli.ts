@@ -1,6 +1,6 @@
 #!/usr/bin/env ts-node-esm
 import process from "node:process";
-import { execa, type ExecaError } from "execa";
+import { execaCommand, type ExecaError } from "execa";
 import { exit, tryGetBinPath, tryMapBinPath } from "./helpers.js";
 
 // First two arguments are Node binary and this binary
@@ -24,7 +24,7 @@ if (shouldMap) {
 }
 
 try {
-	await execa(binPath!, args, { stdio: "inherit" });
+	await execaCommand(`${binPath!}${" " + args.join(" ")}`, { stdio: "inherit" });
 } catch (error: unknown) {
 	const potentialError = error as ExecaError | undefined;
 
