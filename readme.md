@@ -133,21 +133,15 @@ $ npx bin-path dist.js:::src.ts
 
 </details>
 
+#### Aliasing
+
+The syntax for mapping to a source binary can be verbose. Adding the following as an alias to your `.zshrc` (or equivalent) could help:
+
+```sh
+alias bin-path-map="bin-path dist.js:::src.ts"
+```
+
 #### Notice
-
-This is an experimental feature, currently only available under the `beta` dist-tag. To use, install `bin-path-cli` with:
-
-```sh
-npm install --global bin-path-cli@beta
-```
-
-<details>
-<summary>Other Package Managers</summary>
-
-```sh
-yarn global add bin-path-cli@beta
-```
-</details>
 
 The feature is under-tested and the syntax is subject to change. If you have any problems or suggestings, please [file an issue](https://github.com/tommy-mitchell/bin-path-cli/issues/new).
 
