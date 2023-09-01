@@ -1,5 +1,6 @@
 import process from "node:process";
 import { getBinPath } from "get-bin-path";
+import logSymbols from "log-symbols";
 import type { Match } from "./types.js";
 
 type ExitArgs = {
@@ -10,7 +11,7 @@ type ExitArgs = {
 /** Exit with an optional error message. */
 export const exit = ({ message, exitCode = 1 }: ExitArgs = {}): never => {
 	if (message) {
-		console.error(message);
+		console.error(`${logSymbols.error} ${message}`);
 	}
 
 	process.exit(exitCode);

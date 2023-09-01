@@ -141,9 +141,8 @@ The syntax for mapping to a source binary can be verbose. Adding the following a
 alias bin-path-map="bin-path dist.js:::src.ts"
 ```
 
-#### Notice
-
-The feature is under-tested and the syntax is subject to change. If you have any problems or suggestings, please [file an issue](https://github.com/tommy-mitchell/bin-path-cli/issues/new).
+> [!NOTE]
+> The feature is under-tested and the syntax is subject to change. If you have any problems or suggestings, please [file an issue](https://github.com/tommy-mitchell/bin-path-cli/issues/new).
 
 ## Related
 

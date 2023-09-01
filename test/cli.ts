@@ -99,7 +99,7 @@ test("no bin", verifyCli, {
 	fixture: "no-bin",
 	expectations: {
 		exitCode: 1,
-		stderr: `No binary found. ${helpText}`,
+		stderr: `✖ No binary found. ${helpText}`,
 	},
 });
 
@@ -145,7 +145,7 @@ test("named binary - no default - errors", verifyCli, {
 	fixture: "named-binaries/no-default",
 	expectations: {
 		exitCode: 1,
-		stderr: `No binary found. ${helpText}`,
+		stderr: `✖ No binary found. ${helpText}`,
 	},
 });
 
@@ -169,7 +169,7 @@ test("handles incorrect execute permissions", verifyCli, {
 	fixture: "bad-permissions",
 	expectations: {
 		exitCode: 1,
-		stderr: "The binary could not be executed. Does it have the right permissions?",
+		stderr: "✖ The binary could not be executed. Does it have the right permissions?",
 	},
 });
 
@@ -177,7 +177,7 @@ test("missing binary", verifyCli, {
 	fixture: "missing-binary",
 	expectations: {
 		exitCode: 1,
-		stderr: "The binary does not exist. Does it need to be built?",
+		stderr: "✖ The binary does not exist. Does it need to be built?",
 	},
 });
 

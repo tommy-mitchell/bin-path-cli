@@ -1,5 +1,6 @@
 import test from "ava";
 import esmock from "esmock";
+import stripAnsi from "strip-ansi";
 
 type MacroArgs = [{
 	exitCode?: number;
@@ -22,7 +23,7 @@ const verifyHelper = test.macro<MacroArgs>(async (t, { exitCode = 1, message = "
 		},
 		import: {
 			console: {
-				error: (errorMessage: string) => verify(errorMessage, message, "message"),
+				error: (errorMessage: string) => verify(stripAnsi(errorMessage), `✖ ${message}`, "message"),
 			},
 		},
 	}) as typeof import("../src/helpers.js");

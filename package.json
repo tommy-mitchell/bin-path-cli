@@ -34,9 +34,11 @@
 	],
 	"scripts": {
 		"prepare": "npm run build",
-		"build": "tsc -p tsconfig.build.json && execify --pkg --fix-shebang",
+		"build": "tsc -p tsconfig.build.json && execify --all",
 		"lint": "xo",
-		"test": "listr 'tsc --noEmit' 'c8 ava'"
+		"test": "tsc --noEmit && npm run ava",
+		"ava": "node -e 'if (process.version.startsWith(`v20`)) process.exit(1)' && ava || npm run ava:20",
+		"ava:20": "cross-env NODE_OPTIONS='--loader=ts-node/esm --loader=esmock --no-warnings=ExperimentalWarning' ava"
 	},
 	"ava": {
 		"files": [
@@ -55,8 +57,9 @@
 		]
 	},
 	"dependencies": {
-		"execa": "^7.2.0",
-		"get-bin-path": "^10.0.0"
+		"execa": "^8.0.1",
+		"get-bin-path": "^10.0.0",
+		"log-symbols": "^5.1.0"
 	},
 	"devDependencies": {
 		"@shopify/semaphore": "^3.0.2",
@@ -65,14 +68,14 @@
 		"ava": "^5.3.1",
 		"c8": "^8.0.1",
 		"cross-env": "^7.0.3",
-		"esmock": "^2.3.6",
-		"execify-cli": "^0.1.0",
+		"esmock": "^2.3.8",
+		"execify-cli": "beta",
 		"is-executable": "^2.0.1",
-		"listr-cli": "^0.3.0",
 		"meow": "^11.0.0",
+		"strip-ansi": "^7.1.0",
 		"testtriple": "^2.2.3",
 		"ts-node": "^10.9.1",
 		"typescript": "~5.1.6",
-		"xo": "^0.54.2"
+		"xo": "^0.56.0"
 	}
 }
