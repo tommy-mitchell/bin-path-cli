@@ -24,7 +24,7 @@
 	},
 	"type": "module",
 	"engines": {
-		"node": ">=16.17"
+		"node": "^18 || ^20"
 	},
 	"bin": {
 		"bin-path": "dist/cli.js"
@@ -64,7 +64,7 @@
 	"devDependencies": {
 		"@shopify/semaphore": "^3.0.2",
 		"@tommy-mitchell/tsconfig": "^1.1.0",
-		"@types/node": "^16.17",
+		"@types/node": "^18",
 		"ava": "^5.3.1",
 		"c8": "^8.0.1",
 		"cross-env": "^7.0.3",
